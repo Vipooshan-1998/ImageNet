@@ -18,7 +18,7 @@ import spacy
 
 
 class Dataset(Dataset):
-    def __init__(self, dataset_path, img_dataset_path, split_path, ref_interval, objmap_file, training, attention_path):
+    def __init__(self, dataset_path, img_dataset_path, split_path, ref_interval, objmap_file, training):
 
         """
 		Input:
@@ -34,7 +34,7 @@ class Dataset(Dataset):
 
         self.training = training
         self.img_dataset_path = img_dataset_path
-        self.attention_path = attention_path
+        # self.attention_path = attention_path
         self.feature_paths = self._extract_feature_paths(dataset_path, split_path, training)
         self.transform = transforms.Compose([transforms.ToTensor(), ])
         # self.frame_batch_size = frame_batch_size
@@ -164,15 +164,15 @@ class Dataset(Dataset):
         #                                     feature_path.split('/')[-1].split(".")[0][:] + '.npy')
         frame_stats = torch.from_numpy(np.load(frame_stats_file)).float()
 
-		# Attention
-        if curr_vid_label > 0:
-            att_file = os.path.join(self.attention_path, feature_path.split('/')[-2], "positive",
-                                    feature_path.split('/')[-1].split(".")[0][5:] + '.npy')
-        else:
-            att_file = os.path.join(self.attention_path, feature_path.split('/')[-2], "negative",
-                                    feature_path.split('/')[-1].split(".")[0][5:] + '-neg.npy')
+		# # Attention
+  #       if curr_vid_label > 0:
+  #           att_file = os.path.join(self.attention_path, feature_path.split('/')[-2], "positive",
+  #                                   feature_path.split('/')[-1].split(".")[0][5:] + '.npy')
+  #       else:
+  #           att_file = os.path.join(self.attention_path, feature_path.split('/')[-2], "negative",
+  #                                   feature_path.split('/')[-1].split(".")[0][5:] + '-neg.npy')
 
-        all_att_feat = self.transform(np.load(att_file)).squeeze(0)
+  #       all_att_feat = self.transform(np.load(att_file)).squeeze(0)
 
         # Calculating the bbox centers
         cx, cy = (all_bbox[:, :, 0] + all_bbox[:, :, 2]) / 2, (all_bbox[:, :, 1] + all_bbox[:, :, 3]) / 2
@@ -281,11 +281,12 @@ class Dataset(Dataset):
                 video_adj_list += [[i - j, i]]  # adding previous ref_interval neighbors
         video_adj_list = torch.Tensor(video_adj_list).permute((1, 0)).long()
 
-        return data.x, data.edge_index, data.y, all_img_feat, video_adj_list, edge_embeddings, temporal_adj_list, obj_vis_feat, num_objs_list, curr_toa, all_att_feat
+        return data.x, data.edge_index, data.y, all_img_feat, video_adj_list, edge_embeddings, temporal_adj_list, obj_vis_feat, num_objs_list, curr_toa     #all_att_feat
 
     def __len__(self):
         return len(self.feature_paths)
     
+
 
 
 
