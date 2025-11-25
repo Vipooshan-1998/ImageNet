@@ -31,7 +31,7 @@ torch.manual_seed(0)   #3407
 parser = argparse.ArgumentParser()
 parser.add_argument("--dataset_path", type=str, default="data/dad/obj_data", help="Path to extracted objects data")
 parser.add_argument("--img_dataset_path", type=str, default="data/dad/i3d_feat", help="Path to I3D feature data")
-parser.add_argument("--attention_path", type=str, default="", help="Path to attention video data")
+# parser.add_argument("--attention_path", type=str, default="", help="Path to attention video data")
 parser.add_argument("--obj_mapping_file", type=str, default="data/dad/obj_idx_to_labels.json", help="path to object label mapping file")
 parser.add_argument("--split_path", type=str, default="splits_dad/", help="Path to train/test split")
 parser.add_argument("--num_epochs", type=int, default=50, help="Number of training epochs")
@@ -71,7 +71,7 @@ def test_model(epoch, model, test_dataloader):
 	model.eval()
 	total_correct, total, all_toa = 0, 0, []
  
-	for batch_i, (X, edge_index, y_true, img_feat, video_adj_list, edge_embeddings, temporal_adj_list, obj_vis_feat, batch_vec, toa, att_feat) in enumerate(test_dataloader):
+	for batch_i, (X, edge_index, y_true, img_feat, video_adj_list, edge_embeddings, temporal_adj_list, obj_vis_feat, batch_vec, toa) in enumerate(test_dataloader):
         
 		X = X.reshape(-1, X.shape[2])
 		img_feat = img_feat.reshape(-1, img_feat.shape[2])
@@ -194,7 +194,7 @@ def main():
 		ref_interval=opt.ref_interval,
 		objmap_file=opt.obj_mapping_file,
 		training=True,
-		attention_path=opt.attention_path,
+		# attention_path=opt.attention_path,
 	)
 	train_dataloader = DataLoader(train_dataset, batch_size=opt.video_batch_size, shuffle=True, num_workers=8)
 
@@ -207,7 +207,7 @@ def main():
 		ref_interval=opt.ref_interval,
 		objmap_file=opt.obj_mapping_file,
 		training=False,
-		attention_path=opt.attention_path,
+		# attention_path=opt.attention_path,
 	)
 	test_dataloader = DataLoader(test_dataset, batch_size=opt.test_video_batch_size, shuffle=False, num_workers=8)
 
@@ -243,7 +243,7 @@ def main():
 
 		loss, all_toa = 0, []
 
-		for batch_i, (X, edge_index, y_true, img_feat, video_adj_list, edge_embeddings, temporal_adj_list, obj_vis_feat, batch_vec, toa, att_feat) in enumerate(train_dataloader):           
+		for batch_i, (X, edge_index, y_true, img_feat, video_adj_list, edge_embeddings, temporal_adj_list, obj_vis_feat, batch_vec, toa) in enumerate(train_dataloader):           
             
             #Processing the inputs from the dataloader
 			X = X.reshape(-1, X.shape[2])
@@ -366,6 +366,7 @@ def main():
 	
 if __name__ == "__main__":
 	main()
+
 
 
 
