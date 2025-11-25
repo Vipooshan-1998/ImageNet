@@ -75,7 +75,7 @@ def test_model(epoch, model, test_dataloader):
         
 		X = X.reshape(-1, X.shape[2])
 		img_feat = img_feat.reshape(-1, img_feat.shape[2])
-		att_feat = att_feat.reshape(-1, att_feat.shape[2])
+		# att_feat = att_feat.reshape(-1, att_feat.shape[2])
 		edge_index = edge_index.reshape(-1, edge_index.shape[2])
 		edge_embeddings = edge_embeddings.view(-1, edge_embeddings.shape[-1])
 		video_adj_list = video_adj_list.reshape(-1, video_adj_list.shape[2])
@@ -88,7 +88,7 @@ def test_model(epoch, model, test_dataloader):
 		batch_vec = batch_vec.view(-1).long()
 
 		X, edge_index, y, img_feat, video_adj_list = X.to(device), edge_index.to(device), y.to(device), img_feat.to(device), video_adj_list.to(device)
-		att_feat = att_feat.to(device)
+		# att_feat = att_feat.to(device)
 		temporal_adj_list, temporal_edge_w, edge_embeddings, batch_vec = temporal_adj_list.to(device), temporal_edge_w.to(device), edge_embeddings.to(device), batch_vec.to(device)
 		all_toa += [toa.item()]
         
@@ -248,7 +248,7 @@ def main():
             #Processing the inputs from the dataloader
 			X = X.reshape(-1, X.shape[2])
 			img_feat = img_feat.reshape(-1, img_feat.shape[2])
-			att_feat = att_feat.reshape(-1, att_feat.shape[2])
+			# att_feat = att_feat.reshape(-1, att_feat.shape[2])
 			edge_index = edge_index.reshape(-1, edge_index.shape[2])
 			edge_embeddings = edge_embeddings.view(-1, edge_embeddings.shape[-1])
 			video_adj_list = video_adj_list.reshape(-1, video_adj_list.shape[2])
@@ -263,7 +263,7 @@ def main():
 			batch_vec = batch_vec.view(-1).long()
 
 			X, edge_index, y, img_feat, video_adj_list = X.to(device), edge_index.to(device), y.to(device), img_feat.to(device), video_adj_list.to(device)
-			att_feat = att_feat.to(device)
+			# att_feat = att_feat.to(device)
 			temporal_adj_list, temporal_edge_w, edge_embeddings, batch_vec = temporal_adj_list.to(device), temporal_edge_w.to(device), edge_embeddings.to(device), batch_vec.to(device)
 
 			# Get predictions from the model
@@ -366,6 +366,7 @@ def main():
 	
 if __name__ == "__main__":
 	main()
+
 
 
 
