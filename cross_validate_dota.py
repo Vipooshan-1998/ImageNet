@@ -179,8 +179,8 @@ def test_model(epoch, model, test_dataloader, fold):
 
 def train(train_dataloader, test_dataloader, fold):
 
-    # Define network         # Trans_LSTM      Trans_LSTM_Sans_Img_LSTM
-    model = SpaceTempGoG_detr_dota(input_dim=opt.input_dim, embedding_dim=opt.embedding_dim,
+    # Define network
+    model = Img_Trans_Multi_Graph_Net(input_dim=opt.input_dim, embedding_dim=opt.embedding_dim,
                                   img_feat_dim=opt.img_feat_dim, num_classes=opt.num_classes).to(device)
     print(model)
 
@@ -229,44 +229,44 @@ def train(train_dataloader, test_dataloader, fold):
             temporal_adj_list, temporal_edge_w, edge_embeddings, batch_vec = temporal_adj_list.to(
                 device), temporal_edge_w.to(device), edge_embeddings.to(device), batch_vec.to(device)
 
-            # # Get predictions from the model
-            # logits, probs = model(X, edge_index, img_feat, video_adj_list, edge_embeddings, temporal_adj_list,
-            #                       temporal_edge_w, batch_vec)
+            # Get predictions from the model
+            logits, probs = model(X, edge_index, img_feat, video_adj_list, edge_embeddings, temporal_adj_list,
+                                  temporal_edge_w, batch_vec)
 
-            # ----------------------
-            # Run FLOP analysis
-            # ----------------------
-            inputs = (X, edge_index, img_feat, video_adj_list, edge_embeddings, 
-                      temporal_adj_list, temporal_edge_w, batch_vec)          # match forward signature
-            # flop_counter = FlopCounterMode(mods=model, display=False, depth=None)
-            # flops = FlopCountAnalysis(model, inputs)
-            # print(f"Total FLOPs: {flops.total()}")            # only measure FLOPs for the first batch
-            flops, params = profile(model, inputs=inputs)
-            print(f"Total FLOPs: {flops}")            # only measure FLOPs for the first batch
-            print(f"Total Params: {params}") 
-            if batch_i == 0:
-                with torch.no_grad():
-                    with FlopTensorDispatchMode(model) as ftdm:
-                        out = model(X, edge_index, img_feat, video_adj_list,
-                                    edge_embeddings, temporal_adj_list,
-                                    temporal_edge_w, batch_vec)
-                        if isinstance(out, (tuple, list)):
-                            out = out[0]
-                            _ = out.mean()
-                        flops_forward = copy.deepcopy(ftdm.flop_counts)
+            # # ----------------------
+            # # Run FLOP analysis
+            # # ----------------------
+            # inputs = (X, edge_index, img_feat, video_adj_list, edge_embeddings, 
+            #           temporal_adj_list, temporal_edge_w, batch_vec)          # match forward signature
+            # # flop_counter = FlopCounterMode(mods=model, display=False, depth=None)
+            # # flops = FlopCountAnalysis(model, inputs)
+            # # print(f"Total FLOPs: {flops.total()}")            # only measure FLOPs for the first batch
+            # flops, params = profile(model, inputs=inputs)
+            # print(f"Total FLOPs: {flops}")            # only measure FLOPs for the first batch
+            # print(f"Total Params: {params}") 
+            # if batch_i == 0:
+            #     with torch.no_grad():
+            #         with FlopTensorDispatchMode(model) as ftdm:
+            #             out = model(X, edge_index, img_feat, video_adj_list,
+            #                         edge_embeddings, temporal_adj_list,
+            #                         temporal_edge_w, batch_vec)
+            #             if isinstance(out, (tuple, list)):
+            #                 out = out[0]
+            #                 _ = out.mean()
+            #             flops_forward = copy.deepcopy(ftdm.flop_counts)
             
-                # flatten + sum
-                total_flops = 0
-                stack = [flops_forward]
-                while stack:
-                    current = stack.pop()
-                    for v in current.values():
-                        if isinstance(v, (dict, defaultdict)):
-                            stack.append(v)
-                        else:
-                            total_flops += v
+            #     # flatten + sum
+            #     total_flops = 0
+            #     stack = [flops_forward]
+            #     while stack:
+            #         current = stack.pop()
+            #         for v in current.values():
+            #             if isinstance(v, (dict, defaultdict)):
+            #                 stack.append(v)
+            #             else:
+            #                 total_flops += v
             
-                print("Inference FLOPs (first batch):", total_flops)
+            #     print("Inference FLOPs (first batch):", total_flops)
 
 
             # Exclude the actual accident frames from the training
