@@ -58,6 +58,41 @@ best_ap = -1
 best_ap_mtta = -1
 n_frames = 50
 
+## Loss Taken from UString and Modified 
+ce_loss_fn = nn.CrossEntropyLoss(reduction="none")   # frame-wise CE
+
+def exp_loss(logits, y, toa, fps, device):
+    """
+    logits: (T, 2)
+    y:      (T,) integer labels
+    toa:    scalar time of accident (int)
+    fps:    frames per second
+    """
+
+    T = logits.size(0)
+
+    # Cross-entropy loss for each frame (no reduction)
+    ce = ce_loss_fn(logits, y)   # shape (T,)
+
+    # Create time indices t = [0, 1, 2, ... T-1]
+    t = torch.arange(T, device=device).float()
+
+    # penalty = max(0, (toa - t - 1) / fps)
+    penalty = torch.clamp((toa - t - 1) / fps, min=0)
+
+    # exp decay weight   (higher weight → earlier penalty stronger)
+    weights = torch.exp(penalty)
+
+    # positive class = 1
+    pos_mask = (y == 1).float()
+    neg_mask = (y == 0).float()
+
+    pos_loss = weights * ce
+    neg_loss = ce
+
+    # final weighted loss
+    loss = (pos_loss * pos_mask + neg_loss * neg_mask).mean()
+    return loss
 
 def test_model(epoch, model, test_dataloader):
     """ Function to evaluate the model on the test data
@@ -266,7 +301,8 @@ def main():
                                   temporal_edge_w, batch_vec)
 
             # Exclude the actual accident frames from the training
-            c_loss1 = cls_criterion(logits[:toa], y[:toa])
+            # c_loss1 = cls_criterion(logits[:toa], y[:toa])
+            c_loss1 = exp_loss(logits, y, toa, opt.fps, device)     ## Exp Loss
             loss = loss + c_loss1
 
             if (batch_i + 1) % 3 == 0:
