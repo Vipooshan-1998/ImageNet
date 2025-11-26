@@ -59,7 +59,7 @@ best_ap_mtta = -1
 n_frames = 50
 
 ## Loss Taken from UString and Modified 
-ce_loss_fn = nn.CrossEntropyLoss(reduction="none")   # frame-wise CE
+ce_loss_fn = nn.CrossEntropyLoss(reduction="none")    # frame-wise CE
 
 def exp_loss(logits, y, toa, fps, device):
     """
