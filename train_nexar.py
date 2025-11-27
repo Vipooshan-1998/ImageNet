@@ -61,37 +61,57 @@ n_frames = 50
 ## Loss Taken from UString and Modified 
 ce_loss_fn = nn.CrossEntropyLoss(reduction="none")    # frame-wise CE
 
-def exp_loss(logits, y, toa, fps, device):
-    """
-    logits: (T, 2)
-    y:      (T,) integer labels
-    toa:    scalar time of accident (int)
-    fps:    frames per second
-    """
+# def exp_loss(logits, y, toa, fps, device):
+#     """
+#     logits: (T, 2)
+#     y:      (T,) integer labels
+#     toa:    scalar time of accident (int)
+#     fps:    frames per second
+#     """
 
-    T = logits.size(0)
+#     T = logits.size(0)
 
-    # Cross-entropy loss for each frame (no reduction)
-    ce = ce_loss_fn(logits, y)   # shape (T,)
+#     # Cross-entropy loss for each frame (no reduction)
+#     ce = ce_loss_fn(logits, y)   # shape (T,)
 
-    # Create time indices t = [0, 1, 2, ... T-1]
-    t = torch.arange(T, device=device).float()
+#     # Create time indices t = [0, 1, 2, ... T-1]
+#     t = torch.arange(T, device=device).float()
 
-    # penalty = max(0, (toa - t - 1) / fps)
-    penalty = torch.clamp((toa - t - 1) / fps, min=0)
+#     # penalty = max(0, (toa - t - 1) / fps)
+#     penalty = torch.clamp((toa - t - 1) / fps, min=0)
 
-    # exp decay weight   (higher weight → earlier penalty stronger)
-    weights = torch.exp(penalty)
+#     # exp decay weight   (higher weight → earlier penalty stronger)
+#     weights = torch.exp(penalty)
 
-    # positive class = 1
-    pos_mask = (y == 1).float()
-    neg_mask = (y == 0).float()
+#     # positive class = 1
+#     pos_mask = (y == 1).float()
+#     neg_mask = (y == 0).float()
 
-    pos_loss = weights * ce
-    neg_loss = ce
+#     pos_loss = weights * ce
+#     neg_loss = ce
 
-    # final weighted loss
-    loss = (pos_loss * pos_mask + neg_loss * neg_mask).mean()
+#     # final weighted loss
+#     loss = (pos_loss * pos_mask + neg_loss * neg_mask).mean()
+#     return loss
+
+def _exp_loss(self, pred, target, time, toa, fps=20.0):
+    '''
+    :param pred:
+    :param target: onehot codings for binary classification
+    :param time:
+    :param toa:
+    :param fps:
+    :return:
+    '''
+    # positive example (exp_loss)
+    target_cls = target[:, 1]
+    target_cls = target_cls.to(torch.long)
+    penalty = -torch.max(torch.zeros_like(toa).to(toa.device, pred.dtype), (toa.to(pred.dtype) - time - 1) / fps)
+    pos_loss = -torch.mul(torch.exp(penalty), -ce_loss_fn(pred, target_cls))
+    # negative example
+    neg_loss = ce_loss_fn(pred, target_cls)
+
+    loss = torch.mean(torch.add(torch.mul(pos_loss, target[:, 1]), torch.mul(neg_loss, target[:, 0])))
     return loss
 
 def test_model(epoch, model, test_dataloader):
@@ -302,7 +322,8 @@ def main():
 
             # Exclude the actual accident frames from the training
             # c_loss1 = cls_criterion(logits[:toa], y[:toa])
-            c_loss1 = exp_loss(logits, y, toa, opt.fps, device)     ## Exp Loss
+            for t in range(logits[:toa].size(1)):
+                c_loss1 += exp_loss(logits[:toa], y[:toa], toa, opt.fps, device)     ## Exp Loss
             loss = loss + c_loss1
 
             if (batch_i + 1) % 3 == 0:
