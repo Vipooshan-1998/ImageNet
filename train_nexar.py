@@ -94,7 +94,7 @@ ce_loss_fn = nn.CrossEntropyLoss(reduction="none")    # frame-wise CE
 #     loss = (pos_loss * pos_mask + neg_loss * neg_mask).mean()
 #     return loss
 
-def exp_loss(self, pred, target_cls, time, toa, fps=20.0):
+def exp_loss(pred, target_cls, time, toa, device, fps=20.0):
     '''
     :param pred:
     :param target: onehot codings for binary classification
@@ -103,7 +103,7 @@ def exp_loss(self, pred, target_cls, time, toa, fps=20.0):
     :param fps:
     :return:
     '''
-    device = pred.device
+    # device = pred.device
     # convert toa & time to tensors if needed
     toa = torch.as_tensor(toa, device=device, dtype=pred.dtype)
     time = torch.as_tensor(time, device=device, dtype=pred.dtype)
@@ -332,7 +332,7 @@ def main():
             print("y[:toa]: ", y[:toa])
             print("~y[:toa]: ", 1-y[:toa])
             for t in range(logits[:toa].size(1)):
-                c_loss1 += exp_loss(logits[:toa], y[:toa], toa, opt.fps, device)     ## Exp Loss
+                c_loss1 += exp_loss(logits[:toa], y[:toa], t, toa, device, opt.fps)     ## Exp Loss
             loss = loss + c_loss1
 
             if (batch_i + 1) % 3 == 0:
