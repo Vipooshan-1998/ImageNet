@@ -103,15 +103,20 @@ def exp_loss(self, pred, target_cls, time, toa, fps=20.0):
     :param fps:
     :return:
     '''
+    device = pred.device
+    # convert toa & time to tensors if needed
+    toa = torch.as_tensor(toa, device=device, dtype=pred.dtype)
+    time = torch.as_tensor(time, device=device, dtype=pred.dtype)
+  
     # positive example (exp_loss)
     # target_cls = target[:, 1]
     # target_cls = target_cls.to(torch.long)
-    penalty = -torch.max(torch.zeros_like(toa).to(toa.device, pred.dtype), (toa.to(pred.dtype) - time - 1) / fps)
+    penalty = -torch.max(torch.zeros_like(toa), (toa - time - 1) / fps)
     pos_loss = -torch.mul(torch.exp(penalty), -ce_loss_fn(pred, target_cls))
     # negative example
     neg_loss = ce_loss_fn(pred, target_cls)
 
-    loss = torch.mean(torch.add(torch.mul(pos_loss, target_cls), torch.mul(neg_loss, target_cls)))
+    loss = torch.mean(torch.add(torch.mul(pos_loss, target_cls), torch.mul(neg_loss, 1-target_cls)))
     return loss
 
 def test_model(epoch, model, test_dataloader):
