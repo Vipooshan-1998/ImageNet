@@ -94,7 +94,7 @@ ce_loss_fn = nn.CrossEntropyLoss(reduction="none")    # frame-wise CE
 #     loss = (pos_loss * pos_mask + neg_loss * neg_mask).mean()
 #     return loss
 
-def exp_loss(self, pred, target, time, toa, fps=20.0):
+def exp_loss(self, pred, target_cls, time, toa, fps=20.0):
     '''
     :param pred:
     :param target: onehot codings for binary classification
@@ -104,14 +104,14 @@ def exp_loss(self, pred, target, time, toa, fps=20.0):
     :return:
     '''
     # positive example (exp_loss)
-    target_cls = target[:, 1]
+    # target_cls = target[:, 1]
     target_cls = target_cls.to(torch.long)
     penalty = -torch.max(torch.zeros_like(toa).to(toa.device, pred.dtype), (toa.to(pred.dtype) - time - 1) / fps)
     pos_loss = -torch.mul(torch.exp(penalty), -ce_loss_fn(pred, target_cls))
     # negative example
     neg_loss = ce_loss_fn(pred, target_cls)
 
-    loss = torch.mean(torch.add(torch.mul(pos_loss, target[:, 1]), torch.mul(neg_loss, target[:, 0])))
+    loss = torch.mean(torch.add(torch.mul(pos_loss, target_cls), torch.mul(neg_loss, target_cls)))
     return loss
 
 def test_model(epoch, model, test_dataloader):
