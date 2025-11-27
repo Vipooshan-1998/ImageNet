@@ -105,7 +105,7 @@ def exp_loss(self, pred, target_cls, time, toa, fps=20.0):
     '''
     # positive example (exp_loss)
     # target_cls = target[:, 1]
-    target_cls = target_cls.to(torch.long)
+    # target_cls = target_cls.to(torch.long)
     penalty = -torch.max(torch.zeros_like(toa).to(toa.device, pred.dtype), (toa.to(pred.dtype) - time - 1) / fps)
     pos_loss = -torch.mul(torch.exp(penalty), -ce_loss_fn(pred, target_cls))
     # negative example
