@@ -323,6 +323,8 @@ def main():
             # Exclude the actual accident frames from the training
             # c_loss1 = cls_criterion(logits[:toa], y[:toa])
             c_loss1 = 0
+            print("logits[:toa].size(): ", logits[:toa].size())
+            print("y[:toa]: ", y[:toa])
             for t in range(logits[:toa].size(1)):
                 c_loss1 += exp_loss(logits[:toa], y[:toa], toa, opt.fps, device)     ## Exp Loss
             loss = loss + c_loss1
