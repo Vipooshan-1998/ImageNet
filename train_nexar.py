@@ -94,7 +94,7 @@ ce_loss_fn = nn.CrossEntropyLoss(reduction="none")    # frame-wise CE
 #     loss = (pos_loss * pos_mask + neg_loss * neg_mask).mean()
 #     return loss
 
-def _exp_loss(self, pred, target, time, toa, fps=20.0):
+def exp_loss(self, pred, target, time, toa, fps=20.0):
     '''
     :param pred:
     :param target: onehot codings for binary classification
