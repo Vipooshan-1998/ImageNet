@@ -48,8 +48,8 @@ class Dataset(Dataset):
         self.dilation_factor = 1
         self.topk = 10
         self.frame_stats_path = dataset_path[:-8] + 'frames_stats'  # (height, width)
-        self.n_frames = 50                  # 50   # 150
-        # self.start_frame =  150 - 45        # 10   # 150 - 45
+        self.n_frames = 15                  # 50   # 150
+        self.start_frame =  50 - 15        # 10   # 150 - 45
 
         # Obj label to word embeddings
         self.idx_to_classes_obj = json.load(open(objmap_file))
@@ -159,8 +159,8 @@ class Dataset(Dataset):
         #     img_file = os.path.join(self.img_dataset_path, "negative",
         #                             feature_path.split('/')[-1].split(".")[0] + '.npy')
 
-        all_img_feat = self.transform(np.load(img_file)).squeeze(0)
-        # all_img_feat = all_img_feat[self.start_frame:, :]
+        # all_img_feat = self.transform(np.load(img_file)).squeeze(0)
+        all_img_feat = all_img_feat[self.start_frame:, :]
         
         # Use VGG16 Features From 0th Index 
         # all_img_feat = self.transform(all_data['data'][:, 0, :]).squeeze(0)
@@ -179,8 +179,8 @@ class Dataset(Dataset):
         #     frame_stats_file = os.path.join(self.frame_stats_path, "negative",
         #                                     feature_path.split('/')[-1].split(".")[0] + '.npy')
         
-        frame_stats = torch.from_numpy(np.load(frame_stats_file)).float()
-        # frame_stats = frame_stats[self.start_frame:, :]
+        # frame_stats = torch.from_numpy(np.load(frame_stats_file)).float()
+        frame_stats = frame_stats[self.start_frame:, :]
 
         # Calculating the bbox centers
         cx, cy = (all_bbox[:, :, 0] + all_bbox[:, :, 2]) / 2, (all_bbox[:, :, 1] + all_bbox[:, :, 3]) / 2
