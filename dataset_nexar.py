@@ -159,7 +159,7 @@ class Dataset(Dataset):
         #     img_file = os.path.join(self.img_dataset_path, "negative",
         #                             feature_path.split('/')[-1].split(".")[0] + '.npy')
 
-        # all_img_feat = self.transform(np.load(img_file)).squeeze(0)
+        all_img_feat = self.transform(np.load(img_file)).squeeze(0)
         all_img_feat = all_img_feat[self.start_frame:, :]
         
         # Use VGG16 Features From 0th Index 
@@ -179,7 +179,7 @@ class Dataset(Dataset):
         #     frame_stats_file = os.path.join(self.frame_stats_path, "negative",
         #                                     feature_path.split('/')[-1].split(".")[0] + '.npy')
         
-        # frame_stats = torch.from_numpy(np.load(frame_stats_file)).float()
+        frame_stats = torch.from_numpy(np.load(frame_stats_file)).float()
         frame_stats = frame_stats[self.start_frame:, :]
 
         # Calculating the bbox centers
