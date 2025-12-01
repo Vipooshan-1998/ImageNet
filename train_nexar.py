@@ -24,7 +24,7 @@ import argparse
 import time
 from eval_utils import evaluation
 
-torch.manual_seed(0)  # 3407
+# torch.manual_seed(0)  # 3407
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--dataset_path", type=str, default="data/dota/obj_feat", help="Path to extracted objects data")
@@ -49,6 +49,18 @@ opt = parser.parse_args()
 print(opt)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+# set seed for deterministic output
+def set_seed(seed: int) -> None:
+    """Set seed for Python / NumPy / PyTorch (+ CUDA)"""
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+set_seed(42)
 
 # Classification criterion
 cls_criterion = nn.CrossEntropyLoss().to(device)
