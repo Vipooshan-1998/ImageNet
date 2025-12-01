@@ -21,7 +21,6 @@ import matplotlib.pyplot as plt
 
 import argparse
 
-
 import time
 from eval_utils import evaluation
 
@@ -327,13 +326,16 @@ def main():
                                   temporal_edge_w, batch_vec)
 
             # Exclude the actual accident frames from the training
-            # c_loss1 = cls_criterion(logits[:toa], y[:toa])
-            c_loss1 = 0
+            c_loss1 = cls_criterion(logits[:toa], y[:toa])
+
+            ## Exp Loss
             # print("logits[:toa].size(): ", logits[:toa].size())
             # print("y[:toa]: ", y[:toa])
             # print("~y[:toa]: ", 1-y[:toa])
-            for t in range(logits[:toa].size(1)):
-                c_loss1 += exp_loss(logits[:toa], y[:toa], t, toa, device, opt.fps)     ## Exp Loss
+            # c_loss1 = 0
+            # for t in range(logits[:toa].size(1)):
+            #     c_loss1 += exp_loss(logits[:toa], y[:toa], t, toa, device, opt.fps)     ## Exp Loss
+          
             loss = loss + c_loss1
 
             if (batch_i + 1) % 3 == 0:
