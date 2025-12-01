@@ -50,18 +50,6 @@ print(opt)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# set seed for deterministic output
-def set_seed(seed: int) -> None:
-    """Set seed for Python / NumPy / PyTorch (+ CUDA)"""
-    random.seed(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
-
-set_seed(42)
-
 # Classification criterion
 cls_criterion = nn.CrossEntropyLoss().to(device)
 
