@@ -127,8 +127,8 @@ class Dataset(Dataset):
         all_bbox = torch.from_numpy(
             all_data['det']).float()  # (x1, y1, x2, y2, cls, accident/no acc)bottom left and top right coordinates
 
-        # all_feat = all_feat[self.start_frame:, :, :]
-        # all_bbox = all_bbox[self.start_frame:, :, :]
+        all_feat = all_feat[self.start_frame:, :, :]
+        all_bbox = all_bbox[self.start_frame:, :, :]
         
         # curr_vid_label = int(all_data['labels'][1])
         if "neg" in feature_path.split('/')[-1]:
