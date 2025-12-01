@@ -24,7 +24,7 @@ import argparse
 import time
 from eval_utils import evaluation
 
-# torch.manual_seed(0)  # 3407
+torch.manual_seed(0)  # 3407
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--dataset_path", type=str, default="data/dota/obj_feat", help="Path to extracted objects data")
@@ -281,7 +281,7 @@ def main():
     if bool(opt.test_only):
         test_model(0, model, test_dataloader)
 
-    learning_rate = 1e-4
+    learning_rate = 1e-5
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=5e-4)
     scheduler = MultiStepLR(optimizer, milestones=[25], gamma=0.5)
 
@@ -326,7 +326,7 @@ def main():
                                   temporal_edge_w, batch_vec)
 
             # Exclude the actual accident frames from the training
-            c_loss1 = cls_criterion(logits[:toa], y[:toa])
+            c_loss1 = cls_criterion(logits[:toa]/2, y[:toa])
 
             ## Exp Loss
             # print("logits[:toa].size(): ", logits[:toa].size())
