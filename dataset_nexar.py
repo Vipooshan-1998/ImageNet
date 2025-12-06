@@ -48,8 +48,8 @@ class Dataset(Dataset):
         self.dilation_factor = 1
         self.topk = 10
         self.frame_stats_path = dataset_path[:-8] + 'frames_stats'  # (height, width)
-        self.n_frames = 45                  #15   # 50  # 150
-        self.start_frame =  150 - 45         #50 - 15   # 10   # 150 - 45
+        self.n_frames = 50                  # 15, 45, 50, 150
+        # self.start_frame =  150 - 45         #50 - 15   # 10   # 150 - 45
 
         # Obj label to word embeddings
         self.idx_to_classes_obj = json.load(open(objmap_file))
@@ -127,8 +127,8 @@ class Dataset(Dataset):
         all_bbox = torch.from_numpy(
             all_data['det']).float()  # (x1, y1, x2, y2, cls, accident/no acc)bottom left and top right coordinates
 
-        all_feat = all_feat[self.start_frame:, :, :]
-        all_bbox = all_bbox[self.start_frame:, :, :]
+        # all_feat = all_feat[self.start_frame:, :, :]
+        # all_bbox = all_bbox[self.start_frame:, :, :]
         
         # curr_vid_label = int(all_data['labels'][1])
         if "neg" in feature_path.split('/')[-1]:
@@ -160,7 +160,7 @@ class Dataset(Dataset):
         #                             feature_path.split('/')[-1].split(".")[0] + '.npy')
 
         all_img_feat = self.transform(np.load(img_file)).squeeze(0)
-        all_img_feat = all_img_feat[self.start_frame:, :]
+        # all_img_feat = all_img_feat[self.start_frame:, :]
         
         # Use VGG16 Features From 0th Index 
         # all_img_feat = self.transform(all_data['data'][:, 0, :]).squeeze(0)
@@ -180,7 +180,7 @@ class Dataset(Dataset):
         #                                     feature_path.split('/')[-1].split(".")[0] + '.npy')
         
         frame_stats = torch.from_numpy(np.load(frame_stats_file)).float()
-        frame_stats = frame_stats[self.start_frame:, :]
+        # frame_stats = frame_stats[self.start_frame:, :]
 
         # Calculating the bbox centers
         cx, cy = (all_bbox[:, :, 0] + all_bbox[:, :, 2]) / 2, (all_bbox[:, :, 1] + all_bbox[:, :, 3]) / 2
