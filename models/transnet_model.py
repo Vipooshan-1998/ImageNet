@@ -161,6 +161,11 @@ class Img_Trans_Net(nn.Module):
         self.temporal_transformer = TransformerEncoder(encoder_layer, num_layers=2)
 
         # -----------------------
+        # Optional fusion layer to capture complementary patterns
+        # -----------------------
+        self.fusion_fc = nn.Linear(embedding_dim * 2, embedding_dim * 2)
+
+        # -----------------------
         # Classification
         # -----------------------
         # concat_dim = transformer output dimension
@@ -202,6 +207,9 @@ class Img_Trans_Net(nn.Module):
         # -----------------------
         img_feat_trans = self.temporal_transformer(img_feat_proj, is_causal=True)
         img_feat_trans = sanitize(img_feat_trans, "img_feat_trans")
+
+        img_feat_trans = self.fusion_fc(img_feat_trans.squeeze(0))  # fusion after transformer
+        img_feat_trans = sanitize(img_feat_trans, "img_feat_trans fc")    
 
         # -----------------------
         # Classification
