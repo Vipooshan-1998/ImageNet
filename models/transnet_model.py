@@ -223,7 +223,7 @@ class Img_Trans_Net(nn.Module):
 
 class Img_Trans_Net_sans_fc2(nn.Module):
     def __init__(self, input_dim=2048, embedding_dim=128, img_feat_dim=2048, num_classes=2):
-        super(Img_Trans_Net, self).__init__()
+        super(Img_Trans_Net_sans_fc2, self).__init__()
 
         self.embedding_dim = embedding_dim
         self.num_heads = 4
@@ -285,6 +285,7 @@ class Img_Trans_Net_sans_fc2(nn.Module):
         # -----------------------
         img_feat_trans = self.temporal_transformer(img_feat_proj, is_causal=True)
         img_feat_trans = sanitize(img_feat_trans, "img_feat_trans")
+        print("img_feat_trans.shape: ", img_feat_trans.shape)
  
         # -----------------------
         # Classification
