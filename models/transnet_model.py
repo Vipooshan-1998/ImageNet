@@ -296,3 +296,50 @@ class Img_Trans_Net_sans_fc2(nn.Module):
         probs = self.softmax(logits)
 
         return logits, probs
+
+# Image Only
+class Img_Only(nn.Module):
+    def __init__(self, input_dim=2048, embedding_dim=128, img_feat_dim=2048, num_classes=2):
+        super(Img_Only, self).__init__()
+
+        self.embedding_dim = embedding_dim
+
+        # -----------------------
+        # Classification
+        # -----------------------
+        self.classify_fc1 = nn.Linear(img_feat_dim, embedding_dim)
+        self.classify_fc2 = nn.Linear(embedding_dim, num_classes)
+
+        self.relu = nn.LeakyReLU(0.2)
+        self.softmax = nn.Softmax(dim=-1)
+
+    def forward(self, x, edge_index, img_feat, video_adj_list, edge_embeddings=None,
+                temporal_adj_list=None, temporal_edge_w=None, batch_vec=None):
+        """
+        img_feat: (seq_len, img_feat_dim)
+        video_adj_list: graph edges for TransformerConv
+        """
+        # -----------------------
+        # Helper function
+        # -----------------------
+        def sanitize(tensor, name):
+            if torch.isnan(tensor).any() or torch.isinf(tensor).any():
+                valid_mask = torch.isfinite(tensor)
+                if valid_mask.any():
+                    finite_min = tensor[valid_mask].min().item()
+                    finite_max = tensor[valid_mask].max().item()
+                    print(f"[⚠️ Sanitizing {name}] finite_min={finite_min:.4f}, finite_max={finite_max:.4f}")
+                else:
+                    print(f"[⚠️ Sanitizing {name}] all values are NaN or Inf!")
+            tensor = torch.nan_to_num(tensor, nan=0.0, posinf=1e3, neginf=-1e3)
+            tensor = torch.clamp(tensor, -1e3, 1e3)
+            return tensor
+
+        # -----------------------
+        # Classification
+        # -----------------------
+        frame_embed_ = self.relu(self.classify_fc1(img_feat))
+        logits = self.classify_fc2(frame_embed_)
+        probs = self.softmax(logits)
+
+        return logits, probs
