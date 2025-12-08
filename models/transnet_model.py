@@ -285,7 +285,8 @@ class Img_Trans_Net_sans_fc2(nn.Module):
         # -----------------------
         img_feat_trans = self.temporal_transformer(img_feat_proj, is_causal=True)
         img_feat_trans = sanitize(img_feat_trans, "img_feat_trans")
-        print("img_feat_trans.shape: ", img_feat_trans.shape)
+        img_feat_trans = img_feat_trans.squeeze(0)
+        # print("img_feat_trans.shape: ", img_feat_trans.shape)
  
         # -----------------------
         # Classification
