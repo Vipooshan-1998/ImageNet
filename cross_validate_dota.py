@@ -180,7 +180,7 @@ def test_model(epoch, model, test_dataloader, fold):
 def train(train_dataloader, test_dataloader, fold):
 
     # Define network
-    model = Img_Trans_Multi_Graph_Net(input_dim=opt.input_dim, embedding_dim=opt.embedding_dim,
+    model = Img_Trans_Net_sans_fc2(input_dim=opt.input_dim, embedding_dim=opt.embedding_dim,
                                   img_feat_dim=opt.img_feat_dim, num_classes=opt.num_classes).to(device)
     print(model)
 
