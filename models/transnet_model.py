@@ -548,7 +548,7 @@ class Img_Graph_Multi_Graph_Net(nn.Module):
 ## Final Arch
 class Img_Trans_Graph_Trans_Net(nn.Module):
     def __init__(self, input_dim=2048, embedding_dim=128, img_feat_dim=2048, num_classes=2):
-        super(Img_Trans_Multi_Graph_Net, self).__init__()
+        super(Img_Trans_Graph_Trans_Net, self).__init__()
 
         self.embedding_dim = embedding_dim
         self.num_heads = 4
