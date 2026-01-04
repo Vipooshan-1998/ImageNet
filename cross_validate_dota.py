@@ -180,7 +180,7 @@ def test_model(epoch, model, test_dataloader, fold):
 def train(train_dataloader, test_dataloader, fold):
 
     # Define network
-    model = Img_Trans_Graph_Trans_Net(input_dim=opt.input_dim, embedding_dim=opt.embedding_dim,
+    model = Img_Trans_Multi_Graph_Net(input_dim=opt.input_dim, embedding_dim=opt.embedding_dim,
                                   img_feat_dim=opt.img_feat_dim, num_classes=opt.num_classes).to(device)
     print(model)
 
@@ -230,20 +230,20 @@ def train(train_dataloader, test_dataloader, fold):
                 device), temporal_edge_w.to(device), edge_embeddings.to(device), batch_vec.to(device)
 
             # Get predictions from the model
-            # logits, probs = model(X, edge_index, img_feat, video_adj_list, edge_embeddings, temporal_adj_list,
-            #                       temporal_edge_w, batch_vec)
+            logits, probs = model(X, edge_index, img_feat, video_adj_list, edge_embeddings, temporal_adj_list,
+                                  temporal_edge_w, batch_vec)
 
-            # ----------------------
-            # Run FLOP analysis
-            # ----------------------
-            inputs = (X, edge_index, img_feat, video_adj_list, edge_embeddings, 
-                      temporal_adj_list, temporal_edge_w, batch_vec)          # match forward signature
-            # flop_counter = FlopCounterMode(mods=model, display=False, depth=None)
-            # flops = FlopCountAnalysis(model, inputs)
-            # print(f"Total FLOPs: {flops.total()}")            # only measure FLOPs for the first batch
-            flops, params = profile(model, inputs=inputs)
-            print(f"Total FLOPs: {flops}")            # only measure FLOPs for the first batch
-            print(f"Total Params: {params}") 
+            # # ----------------------
+            # # Run FLOP analysis
+            # # ----------------------
+            # inputs = (X, edge_index, img_feat, video_adj_list, edge_embeddings, 
+            #           temporal_adj_list, temporal_edge_w, batch_vec)          # match forward signature
+            # # flop_counter = FlopCounterMode(mods=model, display=False, depth=None)
+            # # flops = FlopCountAnalysis(model, inputs)
+            # # print(f"Total FLOPs: {flops.total()}")            # only measure FLOPs for the first batch
+            # flops, params = profile(model, inputs=inputs)
+            # print(f"Total FLOPs: {flops}")            # only measure FLOPs for the first batch
+            # print(f"Total Params: {params}") 
             # if batch_i == 0:
             #     with torch.no_grad():
             #         with FlopTensorDispatchMode(model) as ftdm:
