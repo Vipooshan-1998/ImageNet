@@ -159,11 +159,11 @@ class Dataset(Dataset):
         #     img_file = os.path.join(self.img_dataset_path, "negative",
         #                             feature_path.split('/')[-1].split(".")[0] + '.npy')
 
-        # all_img_feat = self.transform(np.load(img_file)).squeeze(0)
+        all_img_feat = self.transform(np.load(img_file)).squeeze(0)
         # all_img_feat = all_img_feat[self.start_frame:, :]
         
         # Use VGG16 Features From 0th Index 
-        all_img_feat = self.transform(all_data['data'][:, 0, :]).squeeze(0)
+        # all_img_feat = self.transform(all_data['data'][:, 0, :]).squeeze(0)
 
         # Reading frame stats file
         if curr_vid_label > 0:
